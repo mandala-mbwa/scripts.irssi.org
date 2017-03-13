@@ -76,7 +76,7 @@ sub list_urls {
 	$text =~ s/%/%%/g;
 	$text =~ s/\Q$url/%U$url%U/;
 	if ($recent-1 == $i) {
-	    $string .= '%B»%n';
+	    $string .= '%BÂ»%n';
 	} else {
 	    $string .= ' ';
 	}
@@ -95,6 +95,18 @@ sub event_private_message {
     process_line($server, $nick, $nick, $text);
 }
 sub event_public_message {
+    my ($server, $text, $nick, $address, $target) = @_;
+    process_line($server, $target, $nick, $text);
+}
+sub event_message_irc_own_action {
+    my ($server, $text, $nick, $address) = @_;
+    process_line($server, $nick, $nick, $text);
+}
+sub event_message_irc_action {
+    my ($server, $text, $nick, $address, $target) = @_;
+    process_line($server, $target, $nick, $text);
+}
+sub event_message_irc_notice {
     my ($server, $text, $nick, $address, $target) = @_;
     process_line($server, $target, $nick, $text);
 }
@@ -256,6 +268,9 @@ Irssi::settings_add_bool($IRSSI{'name'}, 'openurl_display_context', 1);
 
 Irssi::signal_add_last("message private", "event_private_message");
 Irssi::signal_add_last("message public", "event_public_message");
+Irssi::signal_add_last("message irc own_action", "event_message_irc_own_action");
+Irssi::signal_add_last("message irc action", "event_message_irc_action");
+Irssi::signal_add_last("message irc notice", "event_message_irc_notice");
 Irssi::signal_add_last("channel topic changed", "event_topic_changed");
 
 #Irssi::signal_add('open url', \&launch_url);
